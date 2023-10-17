@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: ts-consign-service
@@ -21,4 +21,4 @@ spec:
       name: memory
       target:
         type: AverageValue
-        averageValue: 400Mi
+        averageValue: 800Mi

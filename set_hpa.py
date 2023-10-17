@@ -12,7 +12,7 @@ with open("hpa_conf.csv") as csv_file:
 
     for row in csv_reader:
         service_name = str(row[0]).rstrip()
-
+        purpose = row[1]
         cpu_value = int(row[2])
         memory_value = row[3]
         pods_min = int(row[4])
@@ -21,8 +21,8 @@ with open("hpa_conf.csv") as csv_file:
         if pods_max <= 1:
             continue
 
-        if pods_max <= 1:
-            pods_max = 3
+        if pods_max > 1 and pods_max < 5:
+            pods_max = 5
 
         ii += 1
 

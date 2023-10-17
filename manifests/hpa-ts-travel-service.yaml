@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: ts-travel-service
@@ -8,7 +8,7 @@ spec:
     kind: Deployment
     name: ts-travel-service
   minReplicas: 1
-  maxReplicas: 50
+  maxReplicas: 10
   metrics:
   - type: Resource
     resource:
@@ -21,4 +21,4 @@ spec:
       name: memory
       target:
         type: AverageValue
-        averageValue: 400Mi
+        averageValue: 1280Mi

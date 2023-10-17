@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: ts-seat-service
@@ -8,7 +8,7 @@ spec:
     kind: Deployment
     name: ts-seat-service
   minReplicas: 1
-  maxReplicas: 15
+  maxReplicas: 5
   metrics:
   - type: Resource
     resource:
@@ -21,4 +21,4 @@ spec:
       name: memory
       target:
         type: AverageValue
-        averageValue: 400Mi
+        averageValue: 960Mi
