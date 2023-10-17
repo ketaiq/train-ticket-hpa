@@ -53,8 +53,8 @@ with open("hpa_conf.csv") as csv_file:
             with open(target_file_name, "w") as file_target:
                 yaml.dump(data, file_target, sort_keys=False, default_flow_style=False)
 
-            # print(
-            #     os.system(
-            #         "kubectl apply -f {file_name}".format(file_name=target_file_name)
-            #     )
-            # )
+            print(
+                os.system(
+                    "kubectl apply -f {file_name}".format(file_name=target_file_name)
+                )
+            )
