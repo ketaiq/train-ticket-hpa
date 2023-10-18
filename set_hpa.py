@@ -1,60 +1,50 @@
 import csv
 import os
 import yaml
+import pandas as pd
 from yaml.loader import SafeLoader
 
 template_file_name = "manifests/hpa-template.yaml"
+# updated_hpa = {
+#     "Service": [],
+#     "CPU Threshold (%)": [],
+#     "Memory Threshold (Mb)": [],
+#     "PodsMin": [],
+#     "PodsMax": [],
+# }
 
-with open("hpa_conf.csv") as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=",")
-    header = next(csv_reader)
-    ii = 0
+df_hpa = pd.read_csv("hpa.csv")
+for _, row in df_hpa.iterrows():
+    service_name = row["Service"]
+    cpu_value = int(row["CPU Threshold (%)"])
+    memory_value = row["Memory Threshold (Mb)"]
+    pods_min = int(row["PodsMin"])
+    pods_max = int(row["PodsMax"])
+    with open(template_file_name) as file_template:
+        data = yaml.load(file_template, Loader=SafeLoader)
 
-    for row in csv_reader:
-        service_name = str(row[0]).rstrip()
-        purpose = row[1]
-        cpu_value = int(row[2])
-        memory_value = row[3]
-        pods_min = int(row[4])
-        pods_max = int(row[5])
+        data["metadata"]["name"] = service_name
+        data["spec"]["scaleTargetRef"]["name"] = service_name
+        data["spec"]["minReplicas"] = pods_min
+        data["spec"]["maxReplicas"] = pods_max
 
-        if pods_max <= 1:
-            continue
+        for jj in range(len(data["spec"]["metrics"])):
+            metric_resource_name = data["spec"]["metrics"][jj]["resource"]["name"]
 
-        if pods_max > 1 and pods_max < 5:
-            pods_max = 5
+            if metric_resource_name == "cpu":
+                data["spec"]["metrics"][jj]["resource"]["target"][
+                    "averageUtilization"
+                ] = cpu_value
 
-        ii += 1
+            if metric_resource_name == "memory":
+                data["spec"]["metrics"][jj]["resource"]["target"][
+                    "averageValue"
+                ] = memory_value
 
-        with open(template_file_name) as file_template:
-            data = yaml.load(file_template, Loader=SafeLoader)
+        target_file_name = "manifests/hpa-{service_name}.yaml".format(
+            service_name=service_name
+        )
+        with open(target_file_name, "w") as file_target:
+            yaml.dump(data, file_target, sort_keys=False, default_flow_style=False)
 
-            data["metadata"]["name"] = service_name
-            data["spec"]["scaleTargetRef"]["name"] = service_name
-            data["spec"]["minReplicas"] = pods_min
-            data["spec"]["maxReplicas"] = pods_max
-
-            for jj in range(len(data["spec"]["metrics"])):
-                metric_resource_name = data["spec"]["metrics"][jj]["resource"]["name"]
-
-                if metric_resource_name == "cpu":
-                    data["spec"]["metrics"][jj]["resource"]["target"][
-                        "averageUtilization"
-                    ] = cpu_value
-
-                if metric_resource_name == "memory":
-                    data["spec"]["metrics"][jj]["resource"]["target"][
-                        "averageValue"
-                    ] = memory_value
-
-            target_file_name = "manifests/hpa-{service_name}.yaml".format(
-                service_name=service_name
-            )
-            with open(target_file_name, "w") as file_target:
-                yaml.dump(data, file_target, sort_keys=False, default_flow_style=False)
-
-            print(
-                os.system(
-                    "kubectl apply -f {file_name}".format(file_name=target_file_name)
-                )
-            )
+        os.system("kubectl apply -f {file_name}".format(file_name=target_file_name))
