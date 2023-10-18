@@ -1,7 +1,7 @@
 Service,Purpose,CPU Threshold (%),Memory Threshold (Mb),PodsMin,PodsMax,lim_cpu,lim_mem
 ts-admin-basic-info-service ,Service,80,800Mi,1,5,400,1000
 ts-admin-order-service      ,Service,80,800Mi,1,10,400,1000
-"ts-admin-route-service						",Service,80,4000Mi,1,1,1000,5000
+ts-admin-route-service      ,Service,80,4000Mi,1,1,1000,5000
 ts-admin-travel-service     ,Service,80,400Mi,1,10,200,500
 ts-admin-user-service       ,Service,80,1600Mi,1,5,500,2000
 ts-assurance-mongo          ,DB,80,400Mi,1,1,100,200
