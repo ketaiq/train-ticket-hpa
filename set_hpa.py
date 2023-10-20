@@ -5,15 +5,8 @@ import pandas as pd
 from yaml.loader import SafeLoader
 
 template_file_name = "manifests/hpa-template.yaml"
-# updated_hpa = {
-#     "Service": [],
-#     "CPU Threshold (%)": [],
-#     "Memory Threshold (Mb)": [],
-#     "PodsMin": [],
-#     "PodsMax": [],
-# }
-
 df_hpa = pd.read_csv("hpa.csv")
+
 for _, row in df_hpa.iterrows():
     service_name = row["Service"]
     cpu_value = int(row["CPU Threshold (%)"])
